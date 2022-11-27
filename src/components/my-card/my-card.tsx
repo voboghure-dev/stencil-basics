@@ -1,4 +1,4 @@
-import { Component, h, Prop, State, Watch } from '@stencil/core';
+import { Component, h, Prop, State } from '@stencil/core';
 
 @Component({
   tag: 'my-card',
@@ -8,23 +8,20 @@ import { Component, h, Prop, State, Watch } from '@stencil/core';
 export class MyCard {
   @Prop({ mutable: true }) userName: string;
 
-  @State() APIData: string;
+  @State() showStencilTab: boolean = false;
+  @State() showReactTab: boolean = false;
 
-  @State() showCard: boolean = true;
-
-  @Watch('userName')
-  watchHandler(newValue: boolean, oldValue: boolean) {
-    console.log('The new value of user name is: ' + newValue + ' old value is: ' + oldValue);
-  }
-
-  changeStates() {
-    this.userName = 'Name Changed!';
-    this.APIData = 'We get API data';
-    this.showCard = false;
-  }
-
-  componentWillUpdate() {
-    console.log('Will update!');
+  changeContent(content: string) {
+    if (content == 'stenciltab') {
+      this.showStencilTab = true;
+      this.showReactTab = false;
+    } else if (content == 'reacttab') {
+      this.showStencilTab = false;
+      this.showReactTab = true;
+    } else {
+      this.showStencilTab = false;
+      this.showReactTab = false;
+    }
   }
 
   render() {
@@ -50,21 +47,24 @@ export class MyCard {
     );
 
     let contentToDisplay = '';
-    if (this.showCard) {
+    if (this.showStencilTab) {
+      contentToDisplay = stencilContent;
+    } else if (this.showReactTab) {
       contentToDisplay = reactContent;
     }
 
     let mainContent = (
       <div class="my-card-wrapper">
         <h1>Hi, I am {this.userName}</h1>
-        <h5>{this.APIData}</h5>
-        <button class="btn-stencil" onClick={this.changeStates.bind(this)}>
+
+        <button class="btn-stencil" onClick={this.changeContent.bind(this, 'stenciltab')}>
           Stencil
         </button>
-        <button class="btn-react">React</button>
+        <button class="btn-react" onClick={this.changeContent.bind(this, 'reacttab')}>
+          React
+        </button>
 
         {contentToDisplay}
-        {stencilContent}
       </div>
     );
 
